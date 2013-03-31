@@ -26,6 +26,7 @@ Here is an example that shows most of the functionality, running two instances o
 
 ```scala
 
+    import de.sciss.processor._
     import concurrent._
     import duration.Duration.Inf
 
@@ -38,7 +39,7 @@ Here is an example that shows most of the functionality, running two instances o
 
       protected def prepare(config: Config): Prepared = new Impl(config)
 
-      private class Impl(config: Config) extends MakeTea with ProcessorImpl[Tea, MakeTea] {
+      private class Impl(config: Config) extends MakeTea with impl.ProcessorImpl[Tea, MakeTea] {
         override def toString = config.variety
 
         protected def body(): Tea = blocking {
