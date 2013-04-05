@@ -52,7 +52,7 @@ object Processor {
 }
 /** A processor extends a `Future` with the possibility of being
   * observed and use-site induced abortion. */
-trait Processor[Product, Repr]
+trait Processor[+Product, Repr]
   extends Future[Product] with Model[Processor.Update[Product, Repr]] {
   /** Asynchronously aborts the process. This method returns immediately. Once the process is aborted,
     * it will dispatch an `Aborted` event. This method may be called repeatedly, although calling
