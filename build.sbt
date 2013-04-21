@@ -1,6 +1,6 @@
 name := "Processor"
 
-version := "0.1.1"
+version := "0.2.0"
 
 organization := "de.sciss"
 
@@ -15,7 +15,7 @@ licenses := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt"))
 initialCommands in console := """import de.sciss.processor._"""
 
 libraryDependencies in ThisBuild ++= Seq(
-  "de.sciss" %% "model" % "0.2.+"
+  "de.sciss" %% "model" % "0.3.+"
 //  "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 )
 
