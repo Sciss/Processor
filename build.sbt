@@ -1,27 +1,29 @@
-name := "Processor"
+name               := "Processor"
 
-version := "0.2.0"
+version            := "0.2.1-SNAPSHOT"
 
-organization := "de.sciss"
+organization       := "de.sciss"
 
-scalaVersion := "2.10.1"
+scalaVersion       := "2.11.0-RC3"
 
-description := "A simple mechanism for running asychronous processes"
+crossScalaVersions := Seq("2.11.0-RC3", "2.10.3")
 
-homepage <<= name { n => Some(url("https://github.com/Sciss/" + n)) }
+description        := "A simple mechanism for running asychronous processes"
 
-licenses := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt"))
+homepage           := Some(url("https://github.com/Sciss/" + name.value))
+
+licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt"))
 
 initialCommands in console := """import de.sciss.processor._"""
 
-libraryDependencies in ThisBuild ++= Seq(
-  "de.sciss" %% "model" % "0.3.+"
-//  "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+libraryDependencies ++= Seq(
+  "de.sciss"      %% "model"     % "0.3.+",
+  "org.scalatest" %% "scalatest" % "2.1.2" % "test"
 )
 
 fork := true
 
-retrieveManaged := true
+// retrieveManaged := true
 
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
 
@@ -29,19 +31,18 @@ scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
 
 publishMavenStyle := true
 
-publishTo <<= version { (v: String) =>
-  Some(if (v endsWith "-SNAPSHOT")
+publishTo :=
+  Some(if (version.value endsWith "-SNAPSHOT")
     "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
   else
     "Sonatype Releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
   )
-}
 
 publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
-pomExtra <<= name { n =>
+pomExtra := { val n = name.value
 <scm>
   <url>git@github.com:Sciss/{n}.git</url>
   <connection>scm:git:git@github.com:Sciss/{n}.git</connection>
@@ -60,9 +61,9 @@ pomExtra <<= name { n =>
 
 seq(lsSettings :_*)
 
-(LsKeys.tags in LsKeys.lsync) := Seq("processor", "asynchronous", "worker")
+(LsKeys.tags   in LsKeys.lsync) := Seq("processor", "asynchronous", "worker")
 
 (LsKeys.ghUser in LsKeys.lsync) := Some("Sciss")
 
-(LsKeys.ghRepo in LsKeys.lsync) <<= name(Some(_))
+(LsKeys.ghRepo in LsKeys.lsync) := Some(name.value)
 
