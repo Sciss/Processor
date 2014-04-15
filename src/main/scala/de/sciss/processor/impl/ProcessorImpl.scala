@@ -2,21 +2,9 @@
  *  ProcessorImpl.scala
  *  (Processor)
  *
- *  Copyright (c) 2013 Hanns Holger Rutz. All rights reserved.
+ *  Copyright (c) 2013-2014 Hanns Holger Rutz. All rights reserved.
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *  This software is published under the GNU Lesser General Public License v2.1+
  *
  *
  *  For further information, please contact Hanns Holger Rutz at
@@ -26,10 +14,11 @@
 package de.sciss.processor
 package impl
 
-import concurrent.{ExecutionContext, Future, Promise, future}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise, blocking}
 import de.sciss.model.impl.ModelImpl
+import scala.concurrent.duration.Duration
 
-/** An implementation of `Pprocessor` along with `Processor.Prepared` that handles
+/** An implementation of `Processor` along with `Processor.Prepared` that handles
   * everything except the main processing loop. This must be specified as the only
   * abstract method `body`.
   *
@@ -41,64 +30,69 @@ trait ProcessorImpl[Product, Repr] extends Processor[Product, Repr]
 
   self: Repr =>
 
-  private var _context = Option.empty[ExecutionContext]
-  @volatile private var _aborted = false
-  private var lastProg = -1 // permille resolution
+  private[this] var _context = Option.empty[ExecutionContext]
+  @volatile private[this] var _aborted = false
 
-  private val promise = Promise[Product]()
+  @volatile private[this] var _progress = 0.0
+  private[this] var lastProg  = -1 // per mille resolution
+
+  private[this] val promise = Promise[Product]()
 
   /** Keeps a record of the execution context used for starting this processor.
     * You may use this to start intermediate sub processes. This method may only
     * be used in the `body` method.
     */
-  final implicit protected def exec: ExecutionContext = {
+  final implicit protected def executionContext: ExecutionContext =
     _context.getOrElse(throw new IllegalStateException("Called before the processor was started"))
-  }
 
   // ---- constructor ----
-  final def start()(implicit exec: ExecutionContext) {
-    promise.synchronized {
-      if (_context.isDefined) return  // was already started
-      val res = future { body() }
-      res.onComplete(t => dispatch(Processor.Result(self, t)))
-      promise.completeWith(res)
-      _context = Some(exec)
+  final def start()(implicit executionContext: ExecutionContext): Unit = promise.synchronized {
+    if (_context.isDefined) return  // was already started
+    val res = Future {
+      try body() finally cleanUp()
     }
+    res.onComplete(t => dispatch(Processor.Result(self, t)))
+    promise.completeWith(res)
+    _context = Some(executionContext)
   }
 
   final protected def peerFuture: Future[Product] = promise.future
 
-  /**
-   * Subclasses may override this to be informed immediately. about an abort request.
-   * Otherwise they can pull the aborted status any time by invoking `checkAborted()`.
-   */
-  protected def notifyAborted() {}
+  /** Subclasses may override this to be informed immediately. about an abort request.
+    * Otherwise they can pull the aborted status any time by invoking `checkAborted()`.
+    */
+  protected def notifyAborted(): Unit = ()
 
-  final def abort() {
+  final def abort(): Unit = {
     _aborted = true
     notifyAborted()
   }
 
-  /**
-   * The main processing body
-   */
+  /** The main processing body. */
   protected def body(): Product
 
-  /**
-   * Subclasses may override this to perform further cleanup when the process is aborted.
-   */
-  protected def cleanUp() {}
+  /** Subclasses may override this to perform further cleanup when the process is aborted. */
+  protected def cleanUp(): Unit = ()
 
-  /**
-   * Checks if the process was aborted. If so, throws an `Aborted` exception. The main body
-   * should _not_ try to catch this exception, which will be handled by the underlying infrastructure.
-   * However, the main body should but resource operations in proper `try ... finally` blocks, so
-   * that these resources are freed when `Abort` exception is thrown. Alternatively, the `cleanUp`
-   * method can be overridden to perform such tasks.
-   */
-  protected final def checkAborted() {
-    if (_aborted) throw Processor.Aborted()
+  /** Checks if the process was aborted. If so, throws an `Aborted` exception. The main body
+    * should _not_ try to catch this exception, which will be handled by the underlying infrastructure.
+    * However, the main body should put resource operations in proper `try ... finally` blocks, so
+    * that these resources are freed when `Abort` exception is thrown. Alternatively, the `cleanUp`
+    * method can be overridden to perform such tasks.
+    */
+  protected final def checkAborted(): Unit = if (_aborted) throw Processor.Aborted()
+
+  protected final def await[B](that: Processor[B, _], offset: Double = 0, weight: Double = 1): B = {
+    that.addListener {
+      case Processor.Progress(_, p) => progress = p * weight + offset
+    }
+    val res = blocking {
+      Await.result(that, Duration.Inf)
+    }
+    progress = offset + weight
+    res
   }
+
 
   /** The resolution at which progress reports are dispatched. The default of `100` means that
     * a `Processor.Progress` message is only dispatched if the progress has advanced by at least 1 percent.
@@ -106,17 +100,19 @@ trait ProcessorImpl[Product, Repr] extends Processor[Product, Repr]
     */
   protected val progressResolution = 100
 
-  /**
-   * Invoke this to signalize progress
-   *
-   * @param f the processor's progress in percent (0 to 1). Values outside the 0 to 1 range will be clipped.
-   */
-  protected final def progress(f: Float) {
-    val f0 = if (f < 0f) 0f else if (f > 1f) 1f else f
-    val i = (f0 * progressResolution).toInt
+  /** Invoke this to signalize progress
+    *
+    * @param f the processor's progress in percent (0 to 1). Values outside the 0 to 1 range will be clipped.
+    */
+  protected final def progress_=(f: Double): Unit = {
+    val f0    = if (f < 0.0) 0.0 else if (f > 1.0) 1.0 else f
+    _progress = f0
+    val i     = (f0 * progressResolution).toInt
     if (i > lastProg) {
       lastProg = i
       dispatch(Processor.Progress(self, f0))
     }
   }
+
+  final def progress: Double = _progress
 }

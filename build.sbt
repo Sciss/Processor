@@ -1,12 +1,12 @@
 name               := "Processor"
 
-version            := "0.2.1-SNAPSHOT"
+version            := "0.3.0"
 
 organization       := "de.sciss"
 
-scalaVersion       := "2.11.0-RC3"
+scalaVersion       := "2.11.0-RC4"
 
-crossScalaVersions := Seq("2.11.0-RC3", "2.10.3")
+crossScalaVersions := Seq("2.11.0-RC4", "2.10.4")
 
 description        := "A simple mechanism for running asychronous processes"
 
@@ -17,15 +17,15 @@ licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-
 initialCommands in console := """import de.sciss.processor._"""
 
 libraryDependencies ++= Seq(
-  "de.sciss"      %% "model"     % "0.3.+",
-  "org.scalatest" %% "scalatest" % "2.1.2" % "test"
+  "de.sciss"      %% "model"     % "0.3.2+",
+  "org.scalatest" %% "scalatest" % "2.1.3" % "test"
 )
 
 fork := true
 
-// retrieveManaged := true
+retrieveManaged := true
 
-scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
+scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Xfuture")
 
 // ---- publishing ----
 
