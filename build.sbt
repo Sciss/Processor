@@ -1,12 +1,12 @@
 name               := "Processor"
 
-version            := "0.3.0"
+version            := "0.3.1"
 
 organization       := "de.sciss"
 
-scalaVersion       := "2.11.0"
+scalaVersion       := "2.11.5"
 
-crossScalaVersions := Seq("2.11.0", "2.10.4")
+crossScalaVersions := Seq("2.11.5", "2.10.4")
 
 description        := "A simple mechanism for running asychronous processes"
 
@@ -18,21 +18,21 @@ initialCommands in console := """import de.sciss.processor._"""
 
 libraryDependencies ++= Seq(
   "de.sciss"      %% "model"     % "0.3.2",
-  "org.scalatest" %% "scalatest" % "2.1.3" % "test"
+  "org.scalatest" %% "scalatest" % "2.2.3" % "test"
 )
 
 fork := true
 
 retrieveManaged := true
 
-scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Xfuture")
+scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Xfuture", "-encoding", "utf8")
 
 // ---- publishing ----
 
 publishMavenStyle := true
 
 publishTo :=
-  Some(if (version.value endsWith "-SNAPSHOT")
+  Some(if (isSnapshot.value)
     "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
   else
     "Sonatype Releases"  at "https://oss.sonatype.org/service/local/staging/deploy/maven2"

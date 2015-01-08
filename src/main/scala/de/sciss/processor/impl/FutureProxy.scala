@@ -2,7 +2,7 @@
  *  FutureProxy.scala
  *  (Processor)
  *
- *  Copyright (c) 2013-2014 Hanns Holger Rutz. All rights reserved.
+ *  Copyright (c) 2013-2015 Hanns Holger Rutz. All rights reserved.
  *
  *  This software is published under the GNU Lesser General Public License v2.1+
  *
@@ -14,9 +14,9 @@
 package de.sciss.processor
 package impl
 
-import concurrent.{CanAwait, ExecutionContext, Future, duration}
-import util.Try
-import duration.Duration
+import scala.concurrent.duration.Duration
+import scala.concurrent.{CanAwait, ExecutionContext, Future}
+import scala.util.Try
 
 trait FutureProxy[A] extends Future[A] {
   protected def peerFuture: Future[A]

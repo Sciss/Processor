@@ -2,7 +2,7 @@
  *  ProcessorImpl.scala
  *  (Processor)
  *
- *  Copyright (c) 2013-2014 Hanns Holger Rutz. All rights reserved.
+ *  Copyright (c) 2013-2015 Hanns Holger Rutz. All rights reserved.
  *
  *  This software is published under the GNU Lesser General Public License v2.1+
  *
@@ -14,9 +14,10 @@
 package de.sciss.processor
 package impl
 
-import scala.concurrent.{Await, ExecutionContext, Future, Promise, blocking}
 import de.sciss.model.impl.ModelImpl
+
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 
 /** An implementation of `Processor` along with `Processor.Prepared` that handles
   * everything except the main processing loop. This must be specified as the only
@@ -48,12 +49,12 @@ trait ProcessorImpl[Product, Repr] extends Processor[Product, Repr]
   // ---- constructor ----
   final def start()(implicit executionContext: ExecutionContext): Unit = promise.synchronized {
     if (_context.isDefined) return  // was already started
+    _context = Some(executionContext)
     val res = Future {
       try body() finally cleanUp()
     }
     res.onComplete(t => dispatch(Processor.Result(self, t)))
     promise.completeWith(res)
-    _context = Some(executionContext)
   }
 
   final protected def peerFuture: Future[Product] = promise.future
@@ -86,9 +87,7 @@ trait ProcessorImpl[Product, Repr] extends Processor[Product, Repr]
     that.addListener {
       case Processor.Progress(_, p) => progress = p * weight + offset
     }
-    val res = blocking {
-      Await.result(that, Duration.Inf)
-    }
+    val res = Await.result(that, Duration.Inf)
     progress = offset + weight
     res
   }
