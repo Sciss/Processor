@@ -2,7 +2,7 @@ package de.sciss.processor
 
 import impl.ProcessorImpl
 
-object Example extends App {
+object MakeTeaApp extends App {
   import concurrent._
   import duration.Duration.Inf
 
@@ -15,9 +15,7 @@ object Example extends App {
 
     protected def prepare(config: Config): Prepared = new Impl(config)
 
-    private class Impl(config: Config) extends MakeTea with ProcessorImpl[Tea, MakeTea] {
-      override def toString = config.variety
-
+    private class Impl(val config: Config) extends MakeTea with ProcessorImpl[Tea, MakeTea] {
       protected def body(): Tea = blocking {
         val seconds = config.minutes * 60
         for (i <- 1 to seconds) {
@@ -29,14 +27,16 @@ object Example extends App {
       }
     }
   }
-  trait MakeTea extends Processor[Tea, MakeTea]
+  trait MakeTea extends ProcessorLike[Tea, MakeTea] {
+    def config: MakeTea.Config
+  }
 
   val black = MakeTea(MakeTea.Config("black", 4))
   val green = MakeTea(MakeTea.Config("green", 3))
   val all   = black :: green :: Nil
 
   val obs: MakeTea.Observer = {
-    case prog @ Processor.Progress(p, _)  => println(s"$p brew ${prog.toInt}%")
+    case prog @ Processor.Progress(p, _)  => println(s"${p.config.variety} brew ${prog.toInt}%")
     case Processor.Result(_, v)           => println(v)
   }
 

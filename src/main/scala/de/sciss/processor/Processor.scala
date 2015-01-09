@@ -56,19 +56,52 @@ object Processor {
     def start()(implicit exec: ExecutionContext): Unit
   }
 
-  def apply[A](name: => String)(fun: GenericProcessor[A] => A): GenericProcessor[A] = {
-    val p = new impl.ProcessorImpl[A, GenericProcessor[A]] with GenericProcessor[A] {
+  trait Body {
+    def aborted: Boolean
+    def checkAborted(): Unit
+    var progress: Double
+  }
+
+  /** Creates an ad-hoc processor from a giving body function. The function is
+    * passed the resulting processor and should make use of `checkAborted`
+    * and `progress`.
+    *
+    * @param  name  the name is purely informative and will be used for the processor's `toString` method
+    */
+  def apply[A](name: => String)(fun: Processor[A] with Body => A)(implicit exec: ExecutionContext): Processor[A] = {
+    val p = new impl.ProcessorImpl[A, Processor[A]] with Processor[A] {
       protected def body(): A = fun(this)
       override def toString = name
-
-      start()
     }
+    p.start()
+    p
+  }
+
+  /** Wraps an existing future in the `Processor` interface. The returned
+    * processor will not be able to react to `abort` calls, and the `progress`
+    * will be reported as zero until the future completes.
+    *
+    * @param  name  the name is purely informative and will be used for the processor's `toString` method
+    */
+  def fromFuture[A](name: String, future: Future[A])(implicit exec: ExecutionContext): Processor[A] =
+    new impl.FutureWrapper[A](name, future)
+
+  /** Wraps an existing shell process in the `Processor` interface. The returned
+    * processor will evaluate to the process' exit value. Calling `abort` will
+    * destroy the process.
+    *
+    * @param  name  the name is purely informative and will be used for the processor's `toString` method
+    */
+  def fromProcess(name: String, process: scala.sys.process.Process)
+                 (implicit exec: ExecutionContext): Processor[Int] = {
+    val p = new impl.ProcessWrapper(name, process)
+    p.start()
     p
   }
 }
 /** A processor extends a `Future` with the possibility of being
   * observed and use-site induced abortion. */
-trait Processor[+Product, Repr]
+trait ProcessorLike[+Product, +Repr]
   extends Future[Product] with Model[Processor.Update[Product, Repr]] {
   /** Asynchronously aborts the process. This method returns immediately. Once the process is aborted,
     * it will dispatch an `Aborted` event. This method may be called repeatedly, although calling
@@ -80,4 +113,4 @@ trait Processor[+Product, Repr]
   def progress: Double
 }
 
-trait GenericProcessor[Product] extends Processor[Product, GenericProcessor[Product]]
+trait Processor[+Product] extends ProcessorLike[Product, Processor[Product]]

@@ -65,6 +65,6 @@ trait ProcessorFactory {
 
   type Observer = Model.Listener[Processor.Update[Product, Repr]]
 
-  protected type Generic  = GenericProcessor[Product]
-  protected type Prepared = Repr with Processor[Product, Repr] with Processor.Prepared
+  protected type Generic  = Processor[Product]
+  protected type Prepared = Repr with ProcessorLike[Product, Repr] with Processor.Prepared
 }

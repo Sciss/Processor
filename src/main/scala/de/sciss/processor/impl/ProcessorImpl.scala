@@ -26,30 +26,37 @@ import scala.concurrent.{Await, ExecutionContext, Future, Promise}
   * @tparam Product the result of the process
   * @tparam Repr    the self type of the processor
   */
-trait ProcessorImpl[Product, Repr] extends Processor[Product, Repr]
-  with Processor.Prepared with ModelImpl[Processor.Update[Product, Repr]] with FutureProxy[Product] {
+trait ProcessorImpl[Product, Repr] extends ProcessorLike[Product, Repr]
+  with Processor.Prepared
+  with Processor.Body
+  with ModelImpl[Processor.Update[Product, Repr]]
+  with FutureProxy[Product] {
 
   self: Repr =>
 
-  private[this] var _context = Option.empty[ExecutionContext]
-  @volatile private[this] var _aborted = false
+  private var _context: ExecutionContext = null
+  @volatile private var _aborted    = false
 
-  @volatile private[this] var _progress = 0.0
-  private[this] var lastProg  = -1 // per mille resolution
+  @volatile private var _progress   = 0.0
+  @volatile private var _lastProg   = -1 // per mille resolution
 
-  private[this] val promise = Promise[Product]()
+  private val promise = Promise[Product]()
+
+  private var _child: ProcessorLike[Any, Any] = null
 
   /** Keeps a record of the execution context used for starting this processor.
     * You may use this to start intermediate sub processes. This method may only
     * be used in the `body` method.
     */
-  final implicit protected def executionContext: ExecutionContext =
-    _context.getOrElse(throw new IllegalStateException("Called before the processor was started"))
+  final implicit protected def executionContext: ExecutionContext = {
+    if (_context == null) throw new IllegalStateException("Called before the processor was started")
+    _context
+  }
 
   // ---- constructor ----
   final def start()(implicit executionContext: ExecutionContext): Unit = promise.synchronized {
-    if (_context.isDefined) return  // was already started
-    _context = Some(executionContext)
+    if (_context != null) return  // was already started
+    _context = executionContext
     val res = Future {
       try body() finally cleanUp()
     }
@@ -64,9 +71,12 @@ trait ProcessorImpl[Product, Repr] extends Processor[Product, Repr]
     */
   protected def notifyAborted(): Unit = ()
 
-  final def abort(): Unit = {
-    _aborted = true
-    notifyAborted()
+  final def abort(): Unit = promise.synchronized {
+    if (!_aborted) {
+      _aborted = true
+      if (_child != null) _child.abort()
+      notifyAborted()
+    }
   }
 
   /** The main processing body. */
@@ -81,17 +91,25 @@ trait ProcessorImpl[Product, Repr] extends Processor[Product, Repr]
     * that these resources are freed when `Abort` exception is thrown. Alternatively, the `cleanUp`
     * method can be overridden to perform such tasks.
     */
-  protected final def checkAborted(): Unit = if (_aborted) throw Processor.Aborted()
+  final def checkAborted(): Unit = if (_aborted) throw Processor.Aborted()
 
-  protected final def await[B](that: Processor[B, _], offset: Double = 0, weight: Double = 1): B = {
-    that.addListener {
+  /** Returns `true` if the `abort` method had been called. */
+  final def aborted: Boolean = _aborted
+
+  protected final def await[B](that: ProcessorLike[B, Any], offset: Double = 0, weight: Double = 1): B = {
+    val l = that.addListener {
       case Processor.Progress(_, p) => progress = p * weight + offset
     }
-    val res = Await.result(that, Duration.Inf)
+    val res = try {
+      promise.synchronized(_child = that)
+      Await.result(that, Duration.Inf)
+    } finally {
+      promise.synchronized(_child = null)
+      that.removeListener(l)
+    }
     progress = offset + weight
     res
   }
-
 
   /** The resolution at which progress reports are dispatched. The default of `100` means that
     * a `Processor.Progress` message is only dispatched if the progress has advanced by at least 1 percent.
@@ -103,12 +121,12 @@ trait ProcessorImpl[Product, Repr] extends Processor[Product, Repr]
     *
     * @param f the processor's progress in percent (0 to 1). Values outside the 0 to 1 range will be clipped.
     */
-  protected final def progress_=(f: Double): Unit = {
+  final def progress_=(f: Double): Unit = {
     val f0    = if (f < 0.0) 0.0 else if (f > 1.0) 1.0 else f
     _progress = f0
     val i     = (f0 * progressResolution).toInt
-    if (i > lastProg) {
-      lastProg = i
+    if (i > _lastProg) {
+      _lastProg = i
       dispatch(Processor.Progress(self, f0))
     }
   }

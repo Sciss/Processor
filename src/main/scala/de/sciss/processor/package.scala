@@ -18,13 +18,13 @@ import scala.concurrent.ExecutionContext
 
 package object processor {
   /** Useful extension methods for processors. */
-  implicit final class ProcessorOps(val `this`: Processor[Any, _]) extends AnyVal { me =>
+  implicit final class ProcessorOps(val `this`: ProcessorLike[Any, Any]) extends AnyVal { me =>
     import me.{`this` => proc}
 
     /** A simple progress monitor which prints the current
       * progress to the console, using up to 33 characters.
       */
-    def monitor()(implicit context: ExecutionContext): Unit = {
+    def monitor(printResult: Boolean = true)(implicit context: ExecutionContext): Unit = {
       var lastProg = 0
       proc.addListener {
         case prog @ Processor.Progress(_, _) =>
@@ -43,8 +43,9 @@ package object processor {
           println(s" Failure: $proc")
           err.printStackTrace()
 
-        case Success(_) =>
+        case Success(res) =>
           println(s" Success: $proc")
+          if (printResult) println(s"Result: $res")
       }
     }
   }
