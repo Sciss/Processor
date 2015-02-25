@@ -1,5 +1,9 @@
 # Processor
 
+[![Flattr this](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=sciss&url=https%3A%2F%2Fgithub.com%2FSciss%2FProcessor&title=Processor%20Library&language=Scala&tags=github&category=software)
+[![Build Status](https://travis-ci.org/Sciss/Processor.svg?branch=master)](https://travis-ci.org/Sciss/Processor)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.sciss/processor_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.sciss/processor_2.11)
+
 ## statement
 
 Processor is a simple building block for the Scala programming language, launching asynchronous processing tasks. It is (C)opyright 2013&ndash;2015 by Hanns Holger Rutz. All rights reserved. This project is released under the [GNU Lesser General Public License](https://raw.github.com/Sciss/Processor/master/LICENSE) and comes with absolutely no warranties. To contact the author, send an email to `contact at sciss.de`
