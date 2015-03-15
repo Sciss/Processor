@@ -33,6 +33,7 @@ Simple wrappers for existing `Future` or `Process` instances are provided on the
     import de.sciss.processor._
     import scala.concurrent._
     import ExecutionContext.Implicits.global
+    import scala.sys.process._
 
     val p0  = "sleep 100".run()
     val p1  = Processor.fromProcess("sleep", p0)
