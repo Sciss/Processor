@@ -6,7 +6,7 @@
 
 ## statement
 
-Processor is a simple building block for the Scala programming language, launching asynchronous processing tasks. It is (C)opyright 2013&ndash;2015 by Hanns Holger Rutz. All rights reserved. This project is released under the [GNU Lesser General Public License](https://raw.github.com/Sciss/Processor/master/LICENSE) and comes with absolutely no warranties. To contact the author, send an email to `contact at sciss.de`
+Processor is a simple building block for the Scala programming language, launching asynchronous processing tasks. It is (C)opyright 2013&ndash;2016 by Hanns Holger Rutz. All rights reserved. This project is released under the [GNU Lesser General Public License](https://raw.github.com/Sciss/Processor/master/LICENSE) and comes with absolutely no warranties. To contact the author, send an email to `contact at sciss.de`
 
 ## linking
 
@@ -19,6 +19,10 @@ The current version `v` is `"0.4.0"`
 ## building
 
 This project currently builds against Scala 2.11 and 2.10, using sbt 0.13.
+
+## contributing
+
+Please see the file [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## documentation
 
