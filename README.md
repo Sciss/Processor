@@ -6,7 +6,7 @@
 
 ## statement
 
-Processor is a simple building block for the Scala programming language, launching asynchronous processing tasks. It is (C)opyright 2013&ndash;2016 by Hanns Holger Rutz. All rights reserved. This project is released under the [GNU Lesser General Public License](https://raw.github.com/Sciss/Processor/master/LICENSE) and comes with absolutely no warranties. To contact the author, send an email to `contact at sciss.de`
+Processor is a simple building block for the Scala programming language, launching asynchronous processing tasks. It is (C)opyright 2013&ndash;2017 by Hanns Holger Rutz. All rights reserved. This project is released under the [GNU Lesser General Public License](https://raw.github.com/Sciss/Processor/master/LICENSE) and comes with absolutely no warranties. To contact the author, send an email to `contact at sciss.de`
 
 ## linking
 
@@ -14,11 +14,11 @@ To link to this library:
 
     libraryDependencies += "de.sciss" %% "processor" % v
 
-The current version `v` is `"0.4.0"`
+The current version `v` is `"0.4.1"`
 
 ## building
 
-This project currently builds against Scala 2.11 and 2.10, using sbt 0.13.
+This project currently builds against Scala 2.12, 2.11, 2.10, using sbt 0.13.
 
 ## contributing
 
@@ -79,6 +79,7 @@ Here is an example that shows most of the functionality, running two instances o
 
     import de.sciss.processor._
     import scala.concurrent._
+    import de.sciss.processor.impl
     import duration.Duration.Inf
 
     case class Tea(variety: String)
@@ -98,11 +99,11 @@ Here is an example that shows most of the functionality, running two instances o
             checkAborted()
             progress = i.toDouble/seconds
           }
-          new Tea(config.variety)
+          Tea(config.variety)
         }
       }
     }
-    trait MakeTea extends ProcessorLike[Tea, MakeTea] { def config: MakeTea.config }
+    trait MakeTea extends ProcessorLike[Tea, MakeTea] { def config: MakeTea.Config }
 
     val black = MakeTea(MakeTea.Config("black", 4))
     val green = MakeTea(MakeTea.Config("green", 3))

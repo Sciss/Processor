@@ -23,7 +23,7 @@ object MakeTeaApp extends App {
           checkAborted()
           progress = i.toDouble/seconds
         }
-        new Tea(config.variety)
+        Tea(config.variety)
       }
     }
   }
