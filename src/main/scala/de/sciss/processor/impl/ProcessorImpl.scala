@@ -23,26 +23,26 @@ import scala.concurrent.{Await, ExecutionContext, Future, Promise}
   * everything except the main processing loop. This must be specified as the only
   * abstract method `body`.
   *
-  * @tparam Product the result of the process
+  * @tparam Prod the result of the process
   * @tparam Repr    the self type of the processor
   */
-trait ProcessorImpl[Product, Repr] extends ProcessorLike[Product, Repr]
+trait ProcessorImpl[Prod, Repr] extends ProcessorLike[Prod, Repr]
   with Processor.Prepared
   with Processor.Body
-  with ModelImpl[Processor.Update[Product, Repr]]
-  with FutureProxy[Product] {
+  with ModelImpl[Processor.Update[Prod, Repr]]
+  with FutureProxy[Prod] {
 
   self: Repr =>
 
-  private var _context: ExecutionContext = null
+  private var _context: ExecutionContext = _
   @volatile private var _aborted    = false
 
   @volatile private var _progress   = 0.0
   @volatile private var _lastProg   = -1 // per mille resolution
 
-  private val promise = Promise[Product]()
+  private val promise = Promise[Prod]()
 
-  private var _child: ProcessorLike[Any, Any] = null
+  private var _child: ProcessorLike[Any, Any] = _
 
   /** Keeps a record of the execution context used for starting this processor.
     * You may use this to start intermediate sub processes. This method may only
@@ -64,7 +64,7 @@ trait ProcessorImpl[Product, Repr] extends ProcessorLike[Product, Repr]
     promise.completeWith(res)
   }
 
-  final protected def peerFuture: Future[Product] = promise.future
+  final protected def peerFuture: Future[Prod] = promise.future
 
   /** Subclasses may override this to be informed immediately. about an abort request.
     * Otherwise they can pull the aborted status any time by invoking `checkAborted()`.
@@ -80,7 +80,7 @@ trait ProcessorImpl[Product, Repr] extends ProcessorLike[Product, Repr]
   }
 
   /** The main processing body. */
-  protected def body(): Product
+  protected def body(): Prod
 
   /** Subclasses may override this to perform further cleanup when the process is aborted. */
   protected def cleanUp(): Unit = ()

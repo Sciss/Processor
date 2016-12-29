@@ -1,29 +1,33 @@
-name               := "Processor"
+lazy val baseName  = "Processor"
+lazy val baseNameL = baseName.toLowerCase
 
-version            := "0.4.0"
+lazy val projectVersion = "0.4.1-SNAPSHOT"
+lazy val mimaVersion    = "0.4.0"
 
+name               := baseName
+version            := projectVersion
 organization       := "de.sciss"
-
-scalaVersion       := "2.11.5"
-
-crossScalaVersions := Seq("2.11.5", "2.10.4")
-
+scalaVersion       := "2.11.8"
+crossScalaVersions := Seq("2.12.1", "2.11.8", "2.10.6")
 description        := "A simple mechanism for running asynchronous processes"
-
-homepage           := Some(url("https://github.com/Sciss/" + name.value))
-
+homepage           := Some(url(s"https://github.com/Sciss/${name.value}"))
 licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt"))
+
+mimaPreviousArtifacts := Set("de.sciss" %% baseNameL % mimaVersion)
 
 initialCommands in console := """import de.sciss.processor._"""
 
+lazy val modelVersion     = "0.3.3"
+lazy val scalaTestVersion = "3.0.1"
+
 libraryDependencies ++= Seq(
-  "de.sciss"      %% "model"     % "0.3.2",
-  "org.scalatest" %% "scalatest" % "2.2.3" % "test"
+  "de.sciss"      %% "model"     % modelVersion,
+  "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
 )
 
 fork := true
 
-scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Xfuture", "-encoding", "utf8")
+scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Xfuture", "-encoding", "utf8", "-Xlint")
 
 // ---- console ----
 
@@ -60,14 +64,3 @@ pomExtra := { val n = name.value
    </developer>
 </developers>
 }
-
-// ---- ls.implicit.ly ----
-
-seq(lsSettings :_*)
-
-(LsKeys.tags   in LsKeys.lsync) := Seq("processor", "asynchronous", "worker")
-
-(LsKeys.ghUser in LsKeys.lsync) := Some("Sciss")
-
-(LsKeys.ghRepo in LsKeys.lsync) := Some(name.value)
-
