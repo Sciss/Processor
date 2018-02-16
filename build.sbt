@@ -7,8 +7,8 @@ lazy val mimaVersion    = "0.4.0"
 name               := baseName
 version            := projectVersion
 organization       := "de.sciss"
-scalaVersion       := "2.11.8"
-crossScalaVersions := Seq("2.12.1", "2.11.8", "2.10.6")
+scalaVersion       := "2.13.0-M3"
+crossScalaVersions := Seq("2.12.4", "2.11.12")
 description        := "A simple mechanism for running asynchronous processes"
 homepage           := Some(url(s"https://github.com/Sciss/${name.value}"))
 licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt"))
@@ -17,12 +17,18 @@ mimaPreviousArtifacts := Set("de.sciss" %% baseNameL % mimaVersion)
 
 initialCommands in console := """import de.sciss.processor._"""
 
-lazy val modelVersion     = "0.3.3"
-lazy val scalaTestVersion = "3.0.1"
+lazy val deps = new {
+  val main = new {
+    val model     = "0.3.4"
+  }
+  val test = new {
+    val scalatest = "3.0.5-M1"
+  }
+}
 
 libraryDependencies ++= Seq(
-  "de.sciss"      %% "model"     % modelVersion,
-  "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
+  "de.sciss"      %% "model"     % deps.main.model,
+  "org.scalatest" %% "scalatest" % deps.test.scalatest % "test"
 )
 
 fork := true
