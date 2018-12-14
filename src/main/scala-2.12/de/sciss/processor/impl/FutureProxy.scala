@@ -15,9 +15,8 @@ package de.sciss.processor
 package impl
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{CanAwait, ExecutionContext, Future, Promise}
-import scala.util.control.NonFatal
-import scala.util.{Failure, Try}
+import scala.concurrent.{CanAwait, ExecutionContext, Future}
+import scala.util.Try
 
 trait FutureProxy[A] extends Future[A] {
   protected def peerFuture: Future[A]
@@ -25,7 +24,7 @@ trait FutureProxy[A] extends Future[A] {
   def value: Option[Try[A]] = peerFuture.value
   def isCompleted: Boolean  = peerFuture.isCompleted
 
-  def onComplete[U](func: (Try[A]) => U)(implicit executor: ExecutionContext): Unit =
+  def onComplete[U](func: Try[A] => U)(implicit executor: ExecutionContext): Unit =
     peerFuture.onComplete(func)
 
   def ready(atMost: Duration)(implicit permit: CanAwait): this.type = {

@@ -96,15 +96,15 @@ trait ProcessorImpl[Prod, Repr] extends ProcessorLike[Prod, Repr]
   /** Returns `true` if the `abort` method had been called. */
   final def aborted: Boolean = _aborted
 
-  protected final def await[B](that: ProcessorLike[B, Any], offset: Double = 0, weight: Double = 1): B = {
+  protected final def await[B](that: ProcessorLike[B, Any], offset: Double = 0.0, weight: Double = 1.0): B = {
     val l = that.addListener {
       case Processor.Progress(_, p) => progress = p * weight + offset
     }
     val res = try {
-      promise.synchronized(_child = that)
+      promise.synchronized { _child = that }
       Await.result(that, Duration.Inf)
     } finally {
-      promise.synchronized(_child = null)
+      promise.synchronized { _child = null }
       that.removeListener(l)
     }
     progress = offset + weight
