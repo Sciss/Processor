@@ -1,7 +1,7 @@
 lazy val baseName  = "Processor"
 lazy val baseNameL = baseName.toLowerCase
 
-lazy val projectVersion = "0.4.2-SNAPSHOT"
+lazy val projectVersion = "0.4.2"
 lazy val mimaVersion    = "0.4.0"
 
 name               := baseName
