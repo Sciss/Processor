@@ -8,7 +8,7 @@ name               := baseName
 version            := projectVersion
 organization       := "de.sciss"
 scalaVersion       := "2.12.8"
-crossScalaVersions := Seq("2.12.8", "2.11.12", "2.13.0-RC2")
+crossScalaVersions := Seq("2.12.8", "2.11.12", "2.13.0-RC3")
 description        := "A simple mechanism for running asynchronous processes"
 homepage           := Some(url(s"https://github.com/Sciss/${name.value}"))
 licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt"))
@@ -22,7 +22,7 @@ lazy val deps = new {
     val model = "0.3.4"
   }
   val test = new {
-    val scalaTest = "3.0.8-RC2"
+    val scalaTest = "3.0.8-RC5"
   }
 }
 
@@ -31,11 +31,7 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies += {
-  if (scalaVersion.value == "2.13.0-RC2") {
-    "org.scalatest" % "scalatest_2.13.0-RC1" % deps.test.scalaTest % Test
-  } else {
-    "org.scalatest" %% "scalatest" % deps.test.scalaTest % Test
-  }
+  "org.scalatest" %% "scalatest" % deps.test.scalaTest % Test
 }
 
 fork := true
