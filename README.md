@@ -1,11 +1,11 @@
 # Processor
 
 [![Build Status](https://travis-ci.org/Sciss/Processor.svg?branch=master)](https://travis-ci.org/Sciss/Processor)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.sciss/processor_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.sciss/processor_2.11)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.sciss/processor_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.sciss/processor_2.12)
 
 ## statement
 
-Processor is a simple building block for the Scala programming language, launching asynchronous processing tasks. It is (C)opyright 2013&ndash;2017 by Hanns Holger Rutz. All rights reserved. This project is released under the [GNU Lesser General Public License](https://git.iem.at/sciss/Processor/raw/master/LICENSE) and comes with absolutely no warranties. To contact the author, send an email to `contact at sciss.de`
+Processor is a simple building block for the Scala programming language, launching asynchronous processing tasks. It is (C)opyright 2013&ndash;2019 by Hanns Holger Rutz. All rights reserved. This project is released under the [GNU Lesser General Public License](https://git.iem.at/sciss/Processor/raw/master/LICENSE) and comes with absolutely no warranties. To contact the author, send an email to `contact at sciss.de`
 
 ## linking
 
@@ -17,7 +17,7 @@ The current version `v` is `"0.4.2"`
 
 ## building
 
-This project currently builds against Scala 2.12, 2.11, using sbt.
+This project currently builds against Scala 2.13, 2.12, 2.11, using sbt.
 
 ## contributing
 
