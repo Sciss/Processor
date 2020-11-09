@@ -69,8 +69,25 @@ object Processor {
     * @param  name  the name is purely informative and will be used for the processor's `toString` method
     */
   def apply[A](name: => String)(fun: Processor[A] with Body => A)(implicit exec: ExecutionContext): Processor[A] = {
-    val p = new impl.ProcessorImpl[A, Processor[A]] with Processor[A] {
+    val p = new impl.AbstractProcessor[A] {
       protected def body(): A = fun(this)
+      override def toString: String = name
+    }
+    p.start()
+    p
+  }
+
+  /** Creates an ad-hoc processor from a giving body function. The function is
+    * passed the resulting processor and should make use of `checkAborted`
+    * and `progress`.
+    *
+    * @param  name  the name is purely informative and will be used for the processor's `toString` method
+    */
+  def applyWith[A](name: => String)(fun: Processor[A] with Body => Future[A])
+                  (implicit exec: ExecutionContext): Processor[A] = {
+    val p = new impl.AbstractAsyncProcessor[A] {
+      protected def runBody(): Future[A] = fun(this)
+
       override def toString: String = name
     }
     p.start()

@@ -1,5 +1,7 @@
 package de.sciss.processor
 
+import de.sciss.processor.Ops._
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, blocking}
 

@@ -1,8 +1,9 @@
 package de.sciss.processor
 
-import scala.concurrent.ExecutionContext
-import sys.process._
-import ExecutionContext.Implicits._
+import de.sciss.processor.Ops._
+
+import scala.concurrent.ExecutionContext.Implicits._
+import scala.sys.process._
 
 object ProcessApp extends App {
   val p0  = "sleep 100".run()

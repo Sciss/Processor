@@ -1,5 +1,5 @@
 /*
- *  package.scala
+ *  Ops.scala
  *  (Processor)
  *
  *  Copyright (c) 2013-2020 Hanns Holger Rutz. All rights reserved.
@@ -11,15 +11,14 @@
  *  contact@sciss.de
  */
 
-package de.sciss
+package de.sciss.processor
 
-import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
-package object processor {
+object Ops {
   /** Useful extension methods for processors. */
-  implicit final class ProcessorOps(val `this`: ProcessorLike[Any, Any]) extends AnyVal { me =>
-    import me.{`this` => proc}
+  implicit final class ProcessorOps(private val proc: ProcessorLike[Any, Any]) extends AnyVal { me =>
 
     /** A simple progress monitor which prints the current
       * progress to the console, using up to 33 characters.

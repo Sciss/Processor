@@ -1,11 +1,11 @@
 lazy val baseName  = "Processor"
 lazy val baseNameL = baseName.toLowerCase
 
-lazy val projectVersion = "0.4.3"
-lazy val mimaVersion    = "0.4.0"
+lazy val projectVersion = "0.5.0"
+lazy val mimaVersion    = "0.5.0"
 
 lazy val commonJvmSettings = Seq(
-  crossScalaVersions := Seq("0.27.0-RC1", "2.13.3", "2.12.12"),
+  crossScalaVersions := Seq("3.0.0-M1", "2.13.3", "2.12.12"),
   fork := true,
 )
 
@@ -26,7 +26,7 @@ lazy val commonSettings = Seq(
     val sv = CrossVersion.partialVersion(scalaVersion.value)
     val sub = sv match {
       case Some((2, n)) if n >= 13 => "scala-2.13+"
-      case Some((0, _))            => "scala-2.13+"
+      case Some((3, _))            => "scala-2.13+"
       case _                       => "scala-2.13-"
     }
     Seq(sourceDirPl / sub, sourceDirSh / sub)
@@ -38,7 +38,7 @@ lazy val deps = new {
     val model = "0.3.5"
   }
   val test = new {
-    val scalaTest = "3.2.2"
+    val scalaTest = "3.2.3"
   }
 }
 
