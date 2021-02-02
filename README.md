@@ -1,12 +1,12 @@
 # Processor
 
-[![Build Status](https://travis-ci.org/Sciss/Processor.svg?branch=main)](https://travis-ci.org/Sciss/Processor)
+[![Build Status](https://github.com/Sciss/Processor/workflows/Scala%20CI/badge.svg?branch=main)](https://github.com/Sciss/Processor/actions?query=workflow%3A%22Scala+CI%22)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.sciss/processor_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.sciss/processor_2.13)
 
 ## statement
 
 Processor is a simple building block for the Scala programming language, launching asynchronous processing tasks. 
-It is (C)opyright 2013&ndash;2020 by Hanns Holger Rutz. All rights reserved. This project is released under the 
+It is (C)opyright 2013&ndash;2021 by Hanns Holger Rutz. All rights reserved. This project is released under the 
 [GNU Lesser General Public License](https://git.iem.at/sciss/Processor/raw/main/LICENSE) v2.1+ and comes with 
 absolutely  no warranties. To contact the author, send an e-mail to `contact at sciss.de`.
 

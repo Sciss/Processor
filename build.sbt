@@ -5,7 +5,7 @@ lazy val projectVersion = "0.5.0"
 lazy val mimaVersion    = "0.5.0"
 
 lazy val commonJvmSettings = Seq(
-  crossScalaVersions := Seq("3.0.0-M2", "2.13.4", "2.12.12"),
+  crossScalaVersions := Seq("3.0.0-M3", "2.13.4", "2.12.12"),
   fork := true,
 )
 
