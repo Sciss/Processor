@@ -5,7 +5,7 @@ lazy val projectVersion = "0.5.0"
 lazy val mimaVersion    = "0.5.0"
 
 lazy val commonJvmSettings = Seq(
-  crossScalaVersions := Seq("3.0.0-M3", "2.13.4", "2.12.12"),
+  crossScalaVersions := Seq("3.0.0-RC1", "2.13.4", "2.12.13"),
   fork := true,
 )
 
@@ -17,7 +17,7 @@ lazy val commonSettings = Seq(
   name               := baseName,
 //  version            := projectVersion,
 //  organization       := "de.sciss",
-  scalaVersion       := "2.13.3",
+  scalaVersion       := "2.13.4",
   description        := "A simple mechanism for running asynchronous processes",
   homepage           := Some(url(s"https://git.iem.at/sciss/${name.value}")),
   licenses           := Seq("LGPL v2.1+" -> url("http://www.gnu.org/licenses/lgpl-2.1.txt")),
@@ -42,7 +42,7 @@ lazy val deps = new {
     val model = "0.3.5"
   }
   val test = new {
-    val scalaTest = "3.2.3"
+    val scalaTest = "3.2.4"
   }
 }
 
